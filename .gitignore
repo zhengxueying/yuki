@@ -1,0 +1,14 @@
+*.pyc
+.svn
+local_setting.py
+.idea/*
+test/*
+.tags*
+*.log
+report.html
+log.html
+.project
+.pydevproject
+output.xml
+.settings/*
+/.metadata/
