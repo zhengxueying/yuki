@@ -36,29 +36,21 @@ elif date.today().isoweekday() == 7:
 
 IMAGE_NAME_MAP = {
     'centos6': BASE_DOCKER_REPO + 'centos6',
-    #    'bpc3': BASE_DOCKER_REPO + 'bpc3_source_anonymous_snapshot:' + DATE_TAG,
+    #'bpc3': BASE_DOCKER_REPO + 'bpc3_source_anonymous_snapshot:' + DATE_TAG,
     'bpc3': BASE_DOCKER_REPO + 'bpc3_source_anonymous_snapshot:' + DATE_TAG,
     
     # ----------NPM branch---------------
     # blue whale
-    #'npm3': BASE_DOCKER_REPO + 'npm3_binary_anonymous_git_snapshot:' + "20180118",
-    #'npm3': BASE_DOCKER_REPO + 'npm3_binary_anonymous_git_snapshot:' + DATE_TAG,
     'npm3': BASE_DOCKER_REPO + 'npm3_binary_anonymous_git_release:develop-' + DATE_TAG,
-    #'npm3': BASE_DOCKER_REPO + 'npm3_binary_anonymous_git_release:epic-GAUSS-6888-' + DATE_TAG,
-    #'npm3': BASE_DOCKER_REPO + 'npm3_binary_anonymous_git_release:develop-v3.5.3-' + DATE_TAG,
     # red whale
     #'npm3': BASE_DOCKER_REPO + 'npm3_source_ldap_git_snapshot:' + DATE_TAG,
-    
-    
-    
+ 
     # ----------SP branch---------------
     # blue whale
-    #'smartprobe': BASE_DOCKER_REPO + 'smartprobe_binary_anonymous_git_snapshot:' + "20180118",
-    #'smartprobe': BASE_DOCKER_REPO + 'smartprobe_binary_anonymous_git_snapshot:' + DATE_TAG,
     'smartprobe': BASE_DOCKER_REPO + 'smartprobe_binary_anonymous_git_release:develop-' + DATE_TAG,
     #'smartprobe': BASE_DOCKER_REPO + 'smartprobe_binary_anonymous_git_release:develop-v3.5.3-' + DATE_TAG,
     # red whale
-    #     'smartprobe': BASE_DOCKER_REPO + 'smartprobe_source_ldap_git_snapshot:' + DATE_TAG,
+    #'smartprobe': BASE_DOCKER_REPO + 'smartprobe_source_ldap_git_snapshot:' + DATE_TAG,
 }
 
 try:

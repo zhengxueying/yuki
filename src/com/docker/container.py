@@ -7,7 +7,7 @@ import requests
 import random
 import os
 
-from mycroft.packages.old.settings import IMAGE_NAME_MAP
+from src.com.settings import IMAGE_NAME_MAP
 from .errors import (RequestException,
                      ContainerException,
                      NoCreatedContainerException)
@@ -18,7 +18,6 @@ def check_execption(func):
         resp = func(*arg, **kws)
         if not resp or resp.status_code >= 400:
             raise ContainerException(resp.json())
-
         return resp
     return _check
 

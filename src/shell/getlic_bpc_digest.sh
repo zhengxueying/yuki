@@ -1,0 +1,10 @@
+#/bin/bash
+uuid=`cat /proc/sys/kernel/random/uuid`
+cd /opt/bpc/dp/bin && ./digest.sh
+cd /root
+curl -X POST "http://172.16.11.54:8090/munich/login" -H "Content-Type:application/x-www-form-urlencoded" -d "userName=sherry.zheng" -d "password=enh5QDkxOA==" -o /root/result.txt --cookie-jar /root/cookie.txt
+curl -v -X GET "http://172.16.11.54:8090/munich/bpc/devEnterprise"  --cookie cookie.txt>/dev/null
+curl -v -X POST "http://172.16.11.54:8090/munich/bpc/devEnterprise" --cookie cookie.txt -o result.txt -H "Content-Type: multipart/related" -H "Host:172.16.11.54:8090" -H "Connection:keep-alive" -H "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.36 Safari/537.36" -H "Accept:*/*" -H "Origin:http://172.16.11.54:8090" -H "X-Requested-With:XMLHttpRequest" -H "Referer:http://172.16.11.54:8090/munich/bpc/devEnterprise" -H "Accept-Encoding:gzip, deflate" -F digestInputFile=@/opt/bpc/dp/bin/dataprovider.digest -F expireDaysAfter=30 -F orderNo=TESTORDER -F volume=2048 -F socp=100 -F serialNumber=LIC_${uuid}_$(date +"%B_%d_%Y") -F authorizedUser=授权信息${uuid} -F scope=dev -F desc=主服务器 -F projectType=DevEnterprise -F insistOnSubmit=false 
+sleep 8
+curl -v -X POST http://172.16.11.54:8090$(curl -X POST http://172.16.11.54:8090/munich/bpc/lic -H "Content-Type:application/x-www-form-urlencoded" -H "Accept-Encoding:gzip, deflate" --cookie cookie.txt --silent --stderr -|grep -A 30 ${uuid}|grep -Eo 'data-url="[^\"]+download"'|grep -Eo '(/munich)[^"]+'|head -1) -F downloadToken=$(date +'%s') --cookie cookie.txt -o /opt/bpc/dp/bin/dataprovider.lic
+

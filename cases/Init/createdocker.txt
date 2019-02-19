@@ -1,0 +1,111 @@
+*** Settings ***
+Library           src.com.docker.RobotDocker    WITH NAME    RobotDocker
+Library           Collections
+Library           String
+
+*** Variables ***
+${docker_ip}      172.16.15.133
+&{BPC_version_map}    v4.3.8=crossflow-bpc-4.3.8.20181019T1656
+
+*** Test Cases ***
+create_docker
+    #创建docker
+    Comment    vminfo    ${docker_ip}    centos6    nic0,nic1
+    Comment    fabric_init    ${docker_ip}
+    Comment    fabric_run_command    yum -y install expect
+    Comment    fabric_run_command    yum -y install expect-devel
+    Comment    fabric_run_command    yum -y install tcl
+    vminfo    172.16.15.134    centos6    nic0,nic1
+
+install_bpc
+    #安装BPC
+    ${version}    Get From Dictionary    ${BPC_version_map}    v4.3.8
+    ${bpc_pkg_url}=    get_bpc_pkg_url    ${version}
+    获取安装包    ${bpc_pkg_url}    ${docker_ip}
+    fabric_init    ${docker_ip}
+    fabric_run_command    tar zxvf /root/${version}.tar.gz
+    RobotDocker.Put File To Host    ${CURDIR}/../shell/autoinstall_bpc_master_4.3.x.sh    /root/${version}/
+    fabric_run_command    chmod +x /root/${version}/autoinstall_bpc_master_4.3.x.sh;cd /root/${version};./autoinstall_bpc_master_4.3.x.sh
+
+uninstall_bpc
+    fabric_init    ${docker_ip}
+    fabric_run_command    bpc stop all
+    sleep    10s
+    fabric_run_command    rm -rf /opt/*
+
+init_bpc
+    #修改shm
+    Fabric Init    ${docker_ip}
+    Fabric Run Command    sed -i 's#<shareHwm unit="MB">1024</shareHwm>#<shareHwm unit="MB">4</shareHwm>#g' /opt/bpc/etc/system/local/pktminer.xml
+    #替换dp正式license
+    Fabric Run Command    mv /opt/bpc/dp/bin/dataprovider-trial.lic /opt/bpc/dp/bin/dataprovider-trial.lic.bak
+    RobotDocker.Put File To Host    ${CURDIR}/../shell/autoinstall_bpc_master_4.3.x.sh    /root
+    fabric_run_command    chmod +x /root/getlic_bpc_digest.sh;cd /root;./getlic_bpc_digest.sh
+
+*** Keywords ***
+vminfo
+    [Arguments]    ${vm_ip}    ${vm_project}    ${vm_eths}
+    ${vm_id}    Set Variable    ${vm_ip}
+    ${vm_desc}    Set Variable    ${vm_ip}
+    ${vm_gateway}    Set Variable    172.16.15.1
+    ${vm_group}    Set Variable    npm_data_group
+    ${docker_whale_ip}    Set Variable    172.16.11.181    # blue whale: 172.16.11.181, red whale: 172.16.14.24
+    ${vm_dockerflyd}    Set Variable    http://${docker_whale_ip}:5123/v1/
+    BuiltIn.Log    -------设置ID--------
+    ${check_vm_id}    Run Keyword And Return Status    Should Not Be Empty    ${vm_id}    not set vm_id, will set default value
+    ${_vm_id}    Set Variable If    ${check_vm_id}==False    npminte_daily_test_npm_palmer    ${vm_id}
+    BuiltIn.Log    -------设置IP--------
+    ${check_vm_ip}    Run Keyword And Return Status    Should Not Be Empty    ${vm_ip}    not set vm_ip, will set default value
+    ${_vm_ip}    Set Variable If    ${check_vm_ip}==False    172.16.15.61    ${vm_ip}
+    BuiltIn.Log    -------设置PROJECT--------
+    ${check_vm_project}    Run Keyword And Return Status    Should Not Be Empty    ${vm_project}    not set vm_project, will set default value
+    ${_vm_project}    Set Variable If    ${check_vm_project}==False    centos6    ${vm_project}
+    BuiltIn.Log    -------设置DESC--------
+    ${check_vm_desc}    Run Keyword And Return Status    Should Not Be Empty    ${vm_desc}    not set vm_desc, will set default value
+    ${_vm_desc}    Set Variable If    ${check_vm_desc}==False    npm3 integration testing    ${vm_desc}
+    BuiltIn.Log    -------设置GATEWAY--------
+    ${check_vm_gateway}    Run Keyword And Return Status    Should Not Be Empty    ${vm_gateway}    not set vm_gateway, will set default value
+    ${_vm_gateway}    Set Variable If    ${check_vm_gateway}==False    172.16.15.1    ${vm_gateway}
+    BuiltIn.Log    -------设置DOCKERFLYD--------
+    ${check_vm_dockerflyd}    Run Keyword And Return Status    Should Not Be Empty    ${vm_dockerflyd}    not set vm_dockerflyd, will set default value
+    ${_vm_dockerflyd}    Set Variable If    ${check_vm_dockerflyd}==False    http://${docker_whale_ip}:5123/v1/    ${vm_dockerflyd}
+    BuiltIn.Log    -------设置GROUP--------
+    ${check_vm_group}    Run Keyword And Return Status    Should Not Be Empty    ${vm_group}    not set vm_group, will set default value
+    ${_vm_group}    Set Variable If    ${check_vm_group}==False    npmg    ${vm_group}
+    BuiltIn.Log    -------设置ETHS--------
+    BuiltIn.Log    ${vm_eths}
+    ${check_vm_eths}    Run Keyword And Return Status    Should Not Be Empty    ${vm_eths}    not set vm_eths, will set default value
+    ${_vm_eths}    Set Variable If    ${check_vm_eths}==False    ${None}    ${vm_eths}
+    Run Keyword If    '${_vm_eths}'=='None'    设置eth为None
+    ...    ELSE    设置多个eths    ${vm_eths}
+    ${vm_info}    Create Dictionary
+    Set To Dictionary    ${vm_info}    id    ${_vm_id}
+    Set To Dictionary    ${vm_info}    ip    ${_vm_ip}
+    Set To Dictionary    ${vm_info}    project    ${_vm_project}
+    Set To Dictionary    ${vm_info}    desc    ${_vm_desc}
+    Set To Dictionary    ${vm_info}    gateway    ${_vm_gateway}
+    Set To Dictionary    ${vm_info}    dockerflyd    ${_vm_dockerflyd}
+    Set To Dictionary    ${vm_info}    group    ${_vm_group}
+    Set To Dictionary    ${vm_info}    veths    ${_vm_eths}
+    &{vm_info}    Convert To Dictionary    ${vm_info}
+    RobotDocker.Create Docker    ${vm_info}
+    BuiltIn.Log    ${vm_info}
+
+设置eth为None
+    ${_vm_eths}=    Create List    @{empty}
+    Set Suite Variable    ${_vm_eths}
+
+设置多个eths
+    [Arguments]    ${vm_eth}
+    ${_vm_eths}=    Split String    ${vm_eth}    ,
+    Set Suite Variable    ${_vm_eths}
+
+获取安装包
+    [Arguments]    ${pkg_url}    ${vm_ip}
+    RobotDocker.Execute Command On Vm    wget ${pkg_url}    ${vm_ip}    ${vm_ip}
+
+get_bpc_pkg_url
+    [Arguments]    ${bpc_version}
+    ${BPC4_base}    set variable    http://10.1.2.12:8080/package_chest/release/
+    ${bpc_version_url}    set variable    ${BPC4_base}${bpc_version}.tar.gz
+    [Return]    ${bpc_version_url}

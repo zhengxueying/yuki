@@ -1,0 +1,8 @@
+dockercmd.py
+setup.py
+dockercmd.egg-info/PKG-INFO
+dockercmd.egg-info/SOURCES.txt
+dockercmd.egg-info/dependency_links.txt
+dockercmd.egg-info/entry_points.txt
+dockercmd.egg-info/requires.txt
+dockercmd.egg-info/top_level.txt

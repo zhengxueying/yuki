@@ -1,0 +1,4 @@
+[console_scripts]
+justforfun = test:fun
+testcli = test:cli
+
