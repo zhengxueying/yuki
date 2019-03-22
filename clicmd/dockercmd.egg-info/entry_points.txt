@@ -1,5 +1,3 @@
 [console_scripts]
-conn = dockercmd:connect
-fabric = dockercmd:fabric_init
-runcmd = dockercmd:fabric_run_cmd
+runcmd = dockercmd:cli
 

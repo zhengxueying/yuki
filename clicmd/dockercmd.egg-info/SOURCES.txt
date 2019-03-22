@@ -1,5 +1,7 @@
+__init__.py
 dockercmd.py
 setup.py
+dist/dockercmd-0.1-py2.7.egg
 dockercmd.egg-info/PKG-INFO
 dockercmd.egg-info/SOURCES.txt
 dockercmd.egg-info/dependency_links.txt

@@ -1,4 +1,7 @@
 *.pyc
+./vscode/*
+*.egg-info/
+*.egg-info/*
 .svn
 local_setting.py
 .idea/*

@@ -4,17 +4,15 @@
 from setuptools import setup,find_packages
 
 setup(
-    name='dockercmd',
+    name='tools',
     version='0.1',
-    py_modules=['dockercmd'],
+    py_modules=['cvtip'],
     install_requires=[
         'Click',
     ],
     entry_points={
     'console_scripts':[
-    # 'conn = dockercmd:connect',
-    # 'fabric = dockercmd:fabric_init',
-    'runcmd = dockercmd:cli',
+    'cvtip = cvtip:convert_ip',
     ],
 }
 )
